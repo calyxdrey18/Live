@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>𝐂𝐚𝐥𝐲𝐱 𝐃𝐫𝐞𝐲 𝐋𝐢𝐯𝐞 𝐂𝐡𝐚𝐭 </title>
+    <title>𝐂𝐚𝐥𝐲𝐱 𝐃𝐫𝐞𝐲 𝐋𝐢𝐯𝐞 𝐂𝐡𝐚𝐭</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,21 +14,29 @@
             --surface-color: #1e1e1e;
             --my-message-color: #3B82F6;
             --other-message-color: #374151;
-            --system-message-color: #4a4a4a;
             --text-color: #e0e0e0;
             --text-secondary-color: #a0a0a0;
             --chat-window-bg: #242424;
             --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
             --error-color: #ef4444;
-            --delete-color: #dc2626;
-            --reply-color: #16a34a;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; height: 100vh; padding: 1rem; overflow: hidden; }
 
+        /* --- Animations --- */
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
         /* --- Welcome Screen --- */
         #welcome-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 100; }
-        .welcome-box { background-color: var(--surface-color); padding: 2rem; border-radius: 16px; text-align: center; box-shadow: var(--card-shadow); width: 90%; max-width: 400px; }
+        .welcome-box { background-color: var(--surface-color); padding: 2rem; border-radius: 16px; text-align: center; box-shadow: var(--card-shadow); width: 90%; max-width: 400px; animation: slideInUp 0.5s ease-out; }
         .welcome-box h2 { margin-bottom: 0.5rem; }
         .welcome-box p { color: var(--text-secondary-color); margin-bottom: 1.5rem; }
         #join-form input { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; border-radius: 20px; border: 2px solid var(--chat-window-bg); background-color: var(--chat-window-bg); color: var(--text-color); margin-bottom: 1rem; }
@@ -43,7 +51,7 @@
         header h1 { font-size: 1.5rem; }
         header .status-bar { font-size: 0.9rem; color: var(--text-secondary-color); margin-top: 4px; }
         header .status-bar a { color: var(--my-message-color); text-decoration: none; }
-        #user-list { font-size: 0.8rem; margin-top: 8px; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #user-list { font-size: 0.8rem; margin-top: 8px; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.3s; }
 
         /* --- Chat Window & Messages --- */
         #chat-window { flex-grow: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; }
@@ -51,21 +59,25 @@
         #chat-window::-webkit-scrollbar-track { background: var(--surface-color); }
         #chat-window::-webkit-scrollbar-thumb { background-color: var(--chat-window-bg); border-radius: 4px; }
         
-        .message-swipe-container { position: relative; overflow: hidden; border-radius: 20px; }
-        .swipe-background { position: absolute; top: 0; bottom: 0; width: 100%; display: flex; align-items: center; color: white; font-size: 1.5rem; }
-        .swipe-background.left { left: 0; justify-content: flex-start; background: var(--delete-color); }
-        .swipe-background.right { right: 0; justify-content: flex-end; background: var(--reply-color); }
-        .swipe-background i { margin: 0 20px; }
+        .message-container { display: flex; align-items: flex-end; max-width: 75%; animation: slideInUp 0.4s ease-out; }
+        .message-container.mine { align-self: flex-end; flex-direction: row-reverse; }
+        .message-container.other { align-self: flex-start; }
+        .message-container.system { align-self: center; max-width: 100%; color: var(--text-secondary-color); font-style: italic; font-size: 0.9em; text-align: center; padding: 0.5rem 0; }
         
-        .message-wrapper { display: flex; flex-direction: column; max-width: 75%; padding: 0.5rem; transition: transform 0.2s ease-out; }
-        .message-wrapper.mine { align-self: flex-end; align-items: flex-end; }
-        .message-wrapper.other { align-self: flex-start; align-items: flex-start; }
-        .message-wrapper.system { align-self: center; max-width: 100%; }
+        .message-wrapper { display: flex; flex-direction: column; }
+        .message-wrapper.mine { align-items: flex-end; }
+        .message-wrapper.other { align-items: flex-start; }
+        
         .message { padding: 0.75rem 1rem; border-radius: 18px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
-        .message-wrapper.mine .message { background-color: var(--my-message-color); color: #fff; border-bottom-right-radius: 4px; }
-        .message-wrapper.other .message { background-color: var(--other-message-color); color: var(--text-color); border-bottom-left-radius: 4px; }
-        .message-wrapper.system { color: var(--text-secondary-color); font-style: italic; font-size: 0.9em; text-align: center; width: 100%; }
+        .message-container.mine .message { background-color: var(--my-message-color); color: #fff; border-bottom-right-radius: 4px; }
+        .message-container.other .message { background-color: var(--other-message-color); color: var(--text-color); border-bottom-left-radius: 4px; }
         .message-meta { font-size: 0.8em; color: var(--text-secondary-color); margin-top: 4px; padding: 0 0.5rem; }
+        
+        .message-actions { display: flex; align-items: center; margin: 0 8px; opacity: 0; transition: opacity 0.2s ease-in-out; }
+        .message-container:hover .message-actions { opacity: 1; }
+        .reply-btn { background: none; border: none; color: var(--text-secondary-color); cursor: pointer; font-size: 0.9rem; padding: 5px; }
+        .reply-btn:hover { color: var(--my-message-color); }
+        
         .reply-context { background: rgba(0,0,0,0.2); padding: 5px 10px; margin-bottom: 5px; border-left: 3px solid var(--text-secondary-color); border-radius: 4px; font-size: 0.9em; }
         .reply-context strong { color: var(--my-message-color); }
         .reply-context blockquote { margin: 0; padding: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -79,12 +91,13 @@
         #reply-preview-content { background: var(--surface-color); border-left: 3px solid var(--my-message-color); padding: 5px 10px; border-radius: 4px; font-size: 0.9em; }
         #cancel-reply-btn { background: none; border: none; color: var(--text-secondary-color); cursor: pointer; float: right; }
         
-        #typing-indicator-container { padding: 0 1.5rem 1rem 1.5rem; height: 24px; font-style: italic; color: var(--text-secondary-color); flex-shrink: 0; }
+        #typing-indicator-container { padding: 0 1.5rem 1rem 1.5rem; height: 24px; font-style: italic; color: var(--text-secondary-color); flex-shrink: 0; transition: opacity 0.3s; }
         #chat-form { display: flex; padding: 1rem; gap: 0.5rem; border-top: 1px solid #333; flex-shrink: 0; }
         #user-input { flex-grow: 1; padding: 0.75rem 1rem; font-size: 1rem; border-radius: 20px; border: 2px solid var(--chat-window-bg); background-color: var(--chat-window-bg); color: var(--text-color); }
         #user-input:focus { outline: none; border-color: var(--my-message-color); }
-        .icon-btn { background: var(--my-message-color); border: none; border-radius: 50%; width: 50px; height: 50px; min-width: 50px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .icon-btn { background: var(--my-message-color); border: none; border-radius: 50%; width: 50px; height: 50px; min-width: 50px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s; }
         .icon-btn:hover { background-color: #2563EB; }
+        .icon-btn:active { transform: scale(0.9); }
         .icon-btn i, .icon-btn svg { font-size: 1.2rem; color: #fff; }
         .icon-btn svg { width: 24px; height: 24px; fill: #fff; }
     </style>
@@ -92,7 +105,7 @@
 <body>
     <div id="welcome-screen">
         <div class="welcome-box">
-            <h2>Welcome to Live Chat Pro</h2>
+            <h2>Welcome to 𝐂𝐚𝐥𝐲𝐱 𝐃𝐫𝐞𝐲 𝐋𝐢𝐯𝐞 𝐂𝐡𝐚𝐭</h2>
             <p>Please choose a unique username to join.</p>
             <form id="join-form">
                 <input type="text" id="username-input" placeholder="Enter your username..." autocomplete="off" required maxlength="15">
@@ -105,7 +118,7 @@
     <div class="chat-container" id="chat-container">
         <header>
             <h1>𝐂𝐚𝐥𝐲𝐱 𝐃𝐫𝐞𝐲 𝐋𝐢𝐯𝐞 𝐂𝐡𝐚𝐭</h1>
-            <div class="status-bar">Developed by <a href="#" target="_blank">𝐂𝐚𝐥𝐲𝐱 𝐃𝐫𝐞𝐲</a></div>
+            <div class="status-bar">Developed by <a href="#" target="_blank">𝐂𝐚𝐥𝐲𝐱 𝐃𝐫𝐞𝐲 </a></div>
             <div id="user-list" title="Users currently online">Online: 0</div>
         </header>
         <div id="chat-window"></div>
@@ -137,38 +150,21 @@
                   userInput = document.getElementById('user-input'), chatWindow = document.getElementById('chat-window'),
                   userList = document.getElementById('user-list'), typingIndicator = document.getElementById('typing-indicator-container'),
                   fileInput = document.getElementById('file-input'), replyPreview = document.getElementById('reply-preview'),
-                  cancelReplyBtn = document.getElementById('cancel-reply-btn');
+                  cancelReplyBtn = document.getElementById('cancel-reply-btn'), sendButton = document.getElementById('send-button');
             
             let typingTimeout, localUser = null, replyToMessage = null;
             let currentlyTyping = {};
 
             const addMessage = (msg) => {
+                const container = document.createElement('div');
                 if (msg.type === 'system') {
-                    const systemMsg = document.createElement('div');
-                    systemMsg.className = 'message-wrapper system';
-                    systemMsg.textContent = msg.content;
-                    chatWindow.appendChild(systemMsg);
+                    container.className = 'message-container system';
+                    container.textContent = msg.content;
                 } else {
-                    const swipeContainer = document.createElement('div');
-                    swipeContainer.className = 'message-swipe-container';
-                    swipeContainer.dataset.messageId = msg.id;
-
-                    const bg = document.createElement('div');
-                    bg.className = 'swipe-background';
-                    
                     const isMine = msg.user.id === localUser.id;
-                    if (isMine) {
-                        bg.classList.add('left');
-                        bg.innerHTML = `<i class="fa-solid fa-trash-can"></i>`;
-                    } else {
-                        bg.classList.add('right');
-                        bg.innerHTML = `<i class="fa-solid fa-reply"></i>`;
-                    }
-                    swipeContainer.appendChild(bg);
+                    container.className = `message-container ${isMine ? 'mine' : 'other'}`;
+                    container.dataset.messageId = msg.id;
 
-                    const wrapper = document.createElement('div');
-                    wrapper.className = `message-wrapper ${isMine ? 'mine' : 'other'}`;
-                    
                     let contentHTML = '';
                     if (msg.replyTo) {
                         contentHTML += `<div class="reply-context"><strong>${msg.replyTo.user}</strong><blockquote>${msg.replyTo.content}</blockquote></div>`;
@@ -184,15 +180,24 @@
                     }
                     
                     const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    wrapper.innerHTML = `<div class="message">${contentHTML}</div><div class="message-meta">${isMine ? 'You' : msg.user.name} at ${time}</div>`;
                     
-                    swipeContainer.appendChild(wrapper);
-                    chatWindow.appendChild(swipeContainer);
+                    // New structure with reply button
+                    container.innerHTML = `
+                        <div class="message-wrapper ${isMine ? 'mine' : 'other'}">
+                            <div class="message">${contentHTML}</div>
+                            <div class="message-meta">${isMine ? 'You' : msg.user.name} at ${time}</div>
+                        </div>
+                        <div class="message-actions">
+                            ${!isMine ? '<button class="reply-btn" title="Reply"><i class="fa-solid fa-reply"></i></button>' : ''}
+                        </div>
+                    `;
                 }
+                chatWindow.appendChild(container);
                 scrollToBottom();
             };
             const scrollToBottom = () => chatWindow.scrollTop = chatWindow.scrollHeight;
 
+            // --- Socket Listeners ---
             socket.on('join-success', ({user, history}) => {
                 localUser = user;
                 welcomeScreen.style.display = 'none';
@@ -202,10 +207,6 @@
             socket.on('join-error', ({ message }) => joinErrorMsg.textContent = message);
             socket.on('system-message', (content) => addMessage({ type: 'system', content }));
             socket.on('chat message', addMessage);
-            socket.on('message deleted', (messageId) => {
-                const msgElement = document.querySelector(`.message-swipe-container[data-message-id='${messageId}']`);
-                if (msgElement) msgElement.remove();
-            });
             socket.on('update-users', ({ users }) => {
                 const userNames = users.map(u => u.name).join(', ');
                 userList.innerHTML = `Online (${users.length}): <span title="Users online: ${userNames}">${userNames}</span>`;
@@ -218,6 +219,7 @@
                 else typingIndicator.textContent = `${typers.length} users are typing...`;
             });
 
+            // --- Event Listeners ---
             joinForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 if (usernameInput.value.trim()) socket.emit('join', usernameInput.value.trim());
@@ -225,6 +227,9 @@
             
             chatForm.addEventListener('submit', (e) => {
                 e.preventDefault();
+                sendButton.style.animation = 'pop 0.2s ease';
+                setTimeout(() => sendButton.style.animation = '', 200);
+
                 if (!userInput.value.trim()) return;
                 socket.emit('chat message', { type: 'text', content: userInput.value, replyTo: replyToMessage });
                 userInput.value = '';
@@ -246,44 +251,24 @@
                             cancelReply();
                         } else alert('File upload failed.');
                     }).catch(err => alert('Upload error.'));
-                fileInput.value = ''; // Reset input
+                fileInput.value = '';
             });
 
-            let touchStartX = 0, touchCurrentX = 0, swipedElement = null, isMine;
-            chatWindow.addEventListener('touchstart', (e) => {
-                const target = e.target.closest('.message-wrapper');
-                if (target) {
-                    swipedElement = target;
-                    isMine = target.classList.contains('mine');
-                    touchStartX = e.touches[0].clientX;
-                }
-            }, { passive: true });
-            
-            chatWindow.addEventListener('touchmove', (e) => {
-                if (!swipedElement) return;
-                touchCurrentX = e.touches[0].clientX;
-                let diffX = touchCurrentX - touchStartX;
-                if ((isMine && diffX < 0 && diffX > -100) || (!isMine && diffX > 0 && diffX < 100)) {
-                    swipedElement.style.transform = `translateX(${diffX}px)`;
-                }
-            }, { passive: true });
-
-            chatWindow.addEventListener('touchend', (e) => {
-                if (!swipedElement) return;
-                const diffX = touchCurrentX - touchStartX;
-                const messageId = parseInt(swipedElement.closest('.message-swipe-container').dataset.messageId);
-                
-                if (isMine && diffX < -60) socket.emit('delete message', messageId);
-                else if (!isMine && diffX > 60) {
-                    const user = swipedElement.querySelector('.message-meta').textContent.split(' at ')[0];
-                    const content = swipedElement.querySelector('.message').textContent.trim().substring(0, 40) + '...';
+            // Event Delegation for Reply buttons
+            chatWindow.addEventListener('click', (e) => {
+                const replyButton = e.target.closest('.reply-btn');
+                if (replyButton) {
+                    const messageContainer = replyButton.closest('.message-container');
+                    const messageId = parseInt(messageContainer.dataset.messageId);
+                    const user = messageContainer.querySelector('.message-meta').textContent.split(' at ')[0];
+                    const content = messageContainer.querySelector('.message').textContent.trim().substring(0, 40) + '...';
+                    
                     replyToMessage = { id: messageId, user, content };
                     replyPreview.style.display = 'block';
                     document.getElementById('reply-user').textContent = user;
                     document.getElementById('reply-text').textContent = content;
+                    userInput.focus();
                 }
-                swipedElement.style.transform = 'translateX(0)';
-                swipedElement = null;
             });
             
             const cancelReply = () => {
