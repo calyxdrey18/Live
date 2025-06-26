@@ -20,9 +20,7 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
+    destination: (req, file, cb) => cb(null, uploadDir),
     filename: (req, file, cb) => {
         const safeFilename = file.originalname.replace(/[^a-zA-Z0-9-._]/g, '');
         cb(null, Date.now() + '-' + safeFilename);
@@ -35,9 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 app.post('/upload', upload.single('file'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded.' });
-    }
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
     res.json({ filePath: `/uploads/${req.file.filename}` });
 });
 
@@ -51,8 +47,7 @@ io.on('connection', (socket) => {
         if (!cleanUsername || cleanUsername.length > 15) {
             return socket.emit('join-error', { message: 'Username must be 1-15 characters.' });
         }
-        const isTaken = Object.values(users).some(u => u.name.toLowerCase() === cleanUsername.toLowerCase());
-        if (isTaken) {
+        if (Object.values(users).some(u => u.name.toLowerCase() === cleanUsername.toLowerCase())) {
             return socket.emit('join-error', { message: 'Username is taken.' });
         }
 
@@ -68,31 +63,18 @@ io.on('connection', (socket) => {
 
         const messageData = {
             id: Date.now(),
-            type: msg.type, // 'text' or 'file'
+            type: msg.type,
             content: msg.content,
             user: users[socket.id],
             replyTo: msg.replyTo,
             timestamp: new Date()
         };
-
         messageHistory.push(messageData);
-        if (messageHistory.length > 200) messageHistory.shift(); // Keep history manageable
+        if (messageHistory.length > 200) messageHistory.shift();
         
         io.emit('chat message', messageData);
     });
     
-    // --- Delete Message Logic ---
-    socket.on('delete message', (messageId) => {
-        const msgIndex = messageHistory.findIndex(m => m.id === messageId);
-        if (msgIndex !== -1) {
-            // Security check: only allow user to delete their own messages
-            if (messageHistory[msgIndex].user.id === socket.id) {
-                messageHistory.splice(msgIndex, 1);
-                io.emit('message deleted', messageId);
-            }
-        }
-    });
-
     // --- Typing & Disconnect Logic ---
     socket.on('typing', () => {
         if (!users[socket.id]) return;
